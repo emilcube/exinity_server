@@ -89,7 +89,7 @@ public:
 		}
 	}
 
-	double valueHandler(const std::string& not_trimmed_out) {
+	std::string valueHandler(const std::string& not_trimmed_out) {
 		std::string out = not_trimmed_out;
 		boost::algorithm::trim(out);
 
@@ -110,7 +110,7 @@ public:
 		catch (...) {
 			Logger::log({ "value isnt integer", out });
 			std::cout << out << " isn't integer\n";
-			return result;
+			return "value isn't integer";
 		}
 
 		if (new_el >= 0 && new_el <= 1023) {
@@ -133,10 +133,11 @@ public:
 		}
 		else {
 			Logger::log({ "value not in range", out });
-			std::cout << "value not in range: " << out << "\n";
+			std::cout << "value " << out << " not in range [0; 1023]\n";
+			return "value not in range [0; 1023]";
 		}
 		std::cout << "result: " << std::to_string(result) << std::endl;
-		return result;
+		return std::to_string(result);
 	}
 
 	void communicator() {
@@ -146,8 +147,9 @@ public:
 			if (ec) { std::cout << ec.message() << std::endl; return; }
 			auto out = beast::buffers_to_string(self->buffer.cdata());
 
-			double res = valueHandler(out);
-			const std::string val = std::to_string(res);
+			std::string val = valueHandler(out);
+			//double res = valueHandler(out);
+			//const std::string val = std::to_string(res);
 
 			self->ws.async_write(boost::asio::buffer(val.c_str(), val.size()), [self](beast::error_code ec, std::size_t bytes_transferred) {
 				if (ec) { std::cout << ec.message() << std::endl; return; }
