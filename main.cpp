@@ -10,7 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <unordered_set>
-//#include <boost/unordered_set.hpp>
 #include "Logger.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -19,30 +18,6 @@ namespace http = beast::http;
 namespace websocket = beast::websocket;
 namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
-
-//#if defined (_MSC_VER)  // Visual studio
-//#define thread_local __declspec( thread )
-//#elif defined (__GCC__) // GCC
-//#define thread_local __thread
-//#endif
-
-//#include <random>
-//#include <time.h>
-//#include <thread>
-
-//using namespace std;
-
-/* Thread-safe function that returns a random number between min and max (inclusive).
-This function takes ~142% the time that calling rand() would take. For this extra
-cost you get a better uniform distribution and thread-safety. */
-int intRand(const int& min, const int& max) {
-	static thread_local std::mt19937* generator = nullptr;
-	if (!generator) generator = new std::mt19937(clock() + std::hash<std::thread::id>()(std::this_thread::get_id()));
-	//std::hash<std::thread::id>()(std::this_thread::get_id())
-	//this_thread::get_id().hash()
-	std::uniform_int_distribution<int> distribution(min, max);
-	return distribution(*generator);
-}
 
 std::unordered_set<int> num;
 unsigned long last_calculated = 0;
@@ -55,8 +30,6 @@ class Websocket : public std::enable_shared_from_this<Websocket>
 {
 	websocket::stream<beast::tcp_stream> ws;
 	beast::flat_buffer buffer;
-	//int sil_;
-	//std::set<int> num_;
 
 public:
 	Websocket(tcp::socket&& socket) : ws(std::move(socket)) {}
@@ -71,14 +44,12 @@ public:
 	static void dumpFile() {
 		Logger::dumplog("start");
 		std::cout << "DumpWriterLogs: start\n";
-		std::ofstream fs;// ("dump.bin", std::ios::out | std::ios::binary | std::ios::app);
-		//std::string dumpNamefile = "dump.bin";
+		std::ofstream fs; // ("dump.bin", std::ios::out | std::ios::binary | std::ios::app); //std::string dumpNamefile = "dump.bin";
 		std::ios_base::openmode mode = std::ios::out | std::ios::binary | std::ios::app;
 		unsigned int old_size = 0;
 
 		while (true) {
 			//std::lock_guard<std::mutex> guard(mtx);
-
 			if (stopped.load(std::memory_order_relaxed)) {
 				Logger::dumplog("closed");
 				std::cout << "DumpWriterLogs: closed\n";
@@ -94,13 +65,13 @@ public:
 					exit(-2);
 				}
 				for (auto& x : num) {
-					//fres  << x << " ";
-					//fs.write(reinterpret_cast<const char*>(x), sizeof x);
-					//temp_str += std::to_string(x) + " ";
-
 					std::string tmp = std::to_string(x);
 					char const* pchar = tmp.c_str();
 					fs.write(pchar, sizeof pchar);
+
+					//fres  << x << " ";
+					//fs.write(reinterpret_cast<const char*>(x), sizeof x);
+					//temp_str += std::to_string(x) + " ";
 
 					//char* rez;
 					//_itoa_s(x, rez, 10);
@@ -118,22 +89,6 @@ public:
 		}
 	}
 
-	void printContainer() {
-		//v2.fetch_add(1);
-		//stopped.store(true, std::memory_order_relaxed);
-		//if (stopped) {
-		//}
-		//if (stopped.load(std::memory_order_relaxed)) {
-		//}
-
-		//for (auto& x : num) {
-		//	std::cout << x << " ";
-		//}
-		//std::cout << "| result = " << result;
-		//std::cout << std::endl;
-		std::cout << "Amount in container: " << num.size() << std::endl;
-	}
-
 	double valueHandler(const std::string& not_trimmed_out) {
 		std::string out = not_trimmed_out;
 		boost::algorithm::trim(out);
@@ -143,9 +98,7 @@ public:
 		if (out == std::string("close")) {
 			stopped.store(true, std::memory_order_relaxed);
 			Logger::log("closed");
-			std::cout << "server closed\n";
-			//std::this_thread::sleep_for(std::chrono::seconds(N));
-			// call destructor and exit;
+			std::cout << "server closed\n"; //std::this_thread::sleep_for(std::chrono::seconds(N)); // call destructor and exit;
 			exit(-3);
 		}
 
@@ -182,7 +135,7 @@ public:
 			Logger::log({ "value not in range", out });
 			std::cout << "value not in range: " << out << "\n";
 		}
-		printContainer();
+		std::cout << "result: " << std::to_string(result) << std::endl;
 		return result;
 	}
 
@@ -204,13 +157,11 @@ public:
 
 			//const size_t len = std::min(boost::asio::buffer_size(v), test.length());
 			//memcpy(boost::asio::buffer_cast<void*>(v),test.c_str(),len);
-			 
 			//self->ws.async_write(self->buffer.data(), [self](beast::error_code ec, std::size_t bytes_transferred) {
 			//	if (ec) { std::cout << ec.message() << std::endl; return; }
 			//	self->buffer.consume(self->buffer.size()); //
 			//	self->communicator();
 			//	});
-
 			//self->communicator();
 
 		});
@@ -223,15 +174,12 @@ public:
 
 class Listener : public std::enable_shared_from_this<Listener>
 {
-	net::io_context& ioc;
-	//tcp::endpoint the_endpoint;// (tcp::v4(), 9999);
+	net::io_context& ioc; //tcp::endpoint the_endpoint;// (tcp::v4(), 9999);
 	tcp::acceptor acceptor;
 
 public:
 	Listener(net::io_context& ioc,
-		unsigned short port) : ioc(ioc),
-		//the_endpoint(net::ip::make_address("127.0.0.1"), port),
-		//acceptor(ioc, the_endpoint){}
+		unsigned short port) : ioc(ioc), //the_endpoint(net::ip::make_address("127.0.0.1"), port), //acceptor(ioc, the_endpoint){}
 		acceptor(ioc, { net::ip::make_address("127.0.0.1"), port }) {}
 
 	void asyncAccept()

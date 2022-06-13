@@ -10,9 +10,6 @@ class Logger
 {
 public:
 
-	//static void logError(const std::string& msg);
-	//static void logError(const std::vector<std::string>& vMsg);
-
 	static void log(const std::string& msg);
 	static void log(const std::vector<std::string>& vMsg);
 	static void dumplog(const std::string& msg);
@@ -21,18 +18,6 @@ public:
 private:
 	static void writeLog(const std::string& filename, const std::string& msg);
 };
-
-
-//inline void Logger::logError(const std::string& msg)
-//{
-//	Logger::writeLog(basePath + fErrLog, msg);
-//}
-//
-//inline void Logger::logError(const std::vector<std::string>& vMsg)
-//{
-//	const auto str = encodeStr(vMsg," ");
-//	Logger::logError(str);
-//}
 
 inline void Logger::initializeLog()
 {
