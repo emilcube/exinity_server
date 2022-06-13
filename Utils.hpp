@@ -70,8 +70,6 @@ inline bool write_to_file(const std::string& file_data, const std::string& file_
 		//std::cout << "Filed to open/create file: " << file_name << std::endl;
 		return false;
 	}
-
-
 }
 
 

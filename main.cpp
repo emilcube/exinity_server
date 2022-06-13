@@ -176,7 +176,7 @@ public:
 
 class Listener : public std::enable_shared_from_this<Listener>
 {
-	net::io_context& ioc; //tcp::endpoint the_endpoint;// (tcp::v4(), 9999);
+	net::io_context& ioc; //tcp::endpoint the_endpoint;// (tcp::v4(), 9999); //
 	tcp::acceptor acceptor;
 
 public:

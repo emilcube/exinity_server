@@ -25,17 +25,17 @@ inline void Logger::initializeLog()
 		const std::string first_mes_event = "#time,event,value\n";
 		write_to_file(first_mes_event, basePath + dumpLog, std::ios_base::app);
 	}
-	else {
-		std::filesystem::remove(basePath + dumpLog);
-	}
+	//else {
+	//	std::filesystem::remove(basePath + dumpLog);
+	//}
 
 	if (!std::filesystem::exists(basePath + servLog)) {
 		const std::string first_mes_event = "#time,event,value,result\n";
 		write_to_file(first_mes_event, basePath + servLog, std::ios_base::app);
 	}
-	else {
-		std::filesystem::remove(basePath + servLog);
-	}
+	//else {
+	//	std::filesystem::remove(basePath + servLog);
+	//}
 
 	return;
 }
